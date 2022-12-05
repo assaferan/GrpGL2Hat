@@ -16,7 +16,7 @@ freeze;
 /////////////////////////////////////////////////////
 
 // This is actually a function on groups - should move it
-import "../ModSym/core.m" : LiftToCosetRep;
+import "../ModSymA/core.m" : LiftToCosetRep;
 import "coercion.m":  MemberTest;
 
 forward FindCusps;
