@@ -101,7 +101,7 @@ end intrinsic;
 */
 
 
-intrinsic '*' (A::GrpGL2HatElt,z::SpcHypElt) -> SpcHypElt
+intrinsic '*' (A::GrpGL2HatElt,z::SpcHypAElt) -> SpcHypAElt
    {"} // "
    // Action on elements of upper half plane union cusps:
 
@@ -167,7 +167,7 @@ intrinsic '*' (A::GrpGL2HatElt,z::SetCspElt) -> SetCspElt
 end intrinsic;
 
 
-intrinsic '*' (A::GrpGL2HatElt,z::[SpcHypElt]) -> SeqEnum
+intrinsic '*' (A::GrpGL2HatElt,z::[SpcHypAElt]) -> SeqEnum
     {"} // "
     // Action on elements of upper half plane union cusps:
     require Universe(z) eq UpperHalfPlaneWithCusps():

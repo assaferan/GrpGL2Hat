@@ -216,7 +216,7 @@ end function;
 /////////////////////////////////////////////////////
 
 
-intrinsic EllipticPoints(G::GrpGL2Hat,H::SpcHyp) -> SeqEnum
+intrinsic EllipticPoints(G::GrpGL2Hat,H::SpcHypA) -> SeqEnum
    {returns a list of inequivalent elliptic points of the congruence
    subgroup G acting on the upperhalf plane H}
    FS := FareySymbol(G);

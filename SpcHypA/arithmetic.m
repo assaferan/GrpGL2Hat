@@ -15,7 +15,7 @@ intrinsic '*' (a::RngElt,x::SpcHypAElt) -> SpcHypAElt
    // some rational.
    // Warning, the following does not really result in something
    // in the upper half plane, but is useful for applying the
-   // action of some congruence subgroup (GrpPSL2).
+   // action of some congruence subgroup (GrpGL2Hat).
    require Type(a) in {FldRatElt,RngIntElt}:
        "Argument 1 must be an integer, rational";
    if a eq 0 then
@@ -94,7 +94,7 @@ end intrinsic;
 intrinsic '+' (x::SpcHypAElt,b::RngIntElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpPSL2).
+// action of some congruence subgroup (GrpGL2Hat).
    z := New(SpcHypAElt);
    z`is_exact     := x`is_exact;
    z`is_cusp      := x`is_cusp;     
@@ -113,7 +113,7 @@ end intrinsic;
 intrinsic '+' (x::SpcHypAElt,b::FldRatElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpPSL2).
+// action of some congruence subgroup (GrpGL2Hat).
    z := New(SpcHypAElt);
    z`is_exact     := x`is_exact;
    z`is_cusp      := x`is_cusp;     
@@ -134,7 +134,7 @@ end intrinsic;
 intrinsic '-' (x::SpcHypAElt,b::RngIntElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpPSL2).
+// action of some congruence subgroup (GrpGL2Hat).
    return x + (-b);
 end intrinsic;
 
@@ -142,7 +142,7 @@ end intrinsic;
 intrinsic '-' (x::SpcHypAElt,b::FldRatElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpPSL2).
+// action of some congruence subgroup (GrpGL2Hat).
    return x + (-b);
 end intrinsic;
 

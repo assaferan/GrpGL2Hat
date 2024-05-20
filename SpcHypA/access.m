@@ -31,3 +31,17 @@ intrinsic ExactValue(x::SpcHypAElt) -> .
     return x`exact_value;
 end intrinsic;
 
+intrinsic Order(x::SpcHypAElt, G::GrpGL2Hat) -> RngIntElt
+{For x an element of the upper half plane, returns the order of its stabilier in G.
+ If x is an elliptic point returns its order (2 or 3). Otherwise returns infinity. }
+  mat := Matrix(Stabilizer(x, G));
+  if HasFiniteOrder(mat) then
+      if (-G!1 in G) then
+	  return Order(mat) div 2;
+      else
+	  return Order(mat);
+      end if;
+  else
+      return Infinity();
+  end if;
+end intrinsic;

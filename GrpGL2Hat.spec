@@ -19,7 +19,7 @@
 
   SpcHypA
   {
-      spec
+      +spec
   }
 }
 
