@@ -16,7 +16,7 @@ freeze;
 
 defaultprecision := Precision(RealField());
 
-intrinsic ComplexValue(z::SpcHypElt : Precision := 0, MaxValue := 600, CheckInfinite:=true) -> FldComElt
+intrinsic ComplexValue(z::SpcHypAElt : Precision := 0, MaxValue := 600, CheckInfinite:=true) -> FldComElt
   {Returns the given element of the upper half plane as a complex number.}
 
   require Type(Precision) eq RngIntElt and Precision ge 0 :
@@ -60,19 +60,19 @@ intrinsic ComplexValue(z::SpcHypElt : Precision := 0, MaxValue := 600, CheckInfi
   return z`complex_value;
 end intrinsic;
 
-intrinsic Imaginary(z::SpcHypElt : Precision := 0, MaxValue := 600) -> FldReElt 
+intrinsic Imaginary(z::SpcHypAElt : Precision := 0, MaxValue := 600) -> FldReElt 
   {The imaginary part of z.}
 
   return Im(ComplexValue(z : Precision := Precision, MaxValue := MaxValue));
 end intrinsic;
 
-intrinsic Real(z::SpcHypElt : Precision := 0, MaxValue := 600) -> FldReElt
+intrinsic Real(z::SpcHypAElt : Precision := 0, MaxValue := 600) -> FldReElt
   {The real part of z.}
 
   return Re(ComplexValue(z : Precision := Precision, MaxValue := MaxValue));
 end intrinsic;
 
-intrinsic AbsoluteValue(z::SpcHypElt : Precision := 0) -> FldReElt
+intrinsic AbsoluteValue(z::SpcHypAElt : Precision := 0) -> FldReElt
   {The absolute value of z.}
 
   return Sqrt(Real(z : Precision := Precision)^2+
@@ -85,7 +85,7 @@ end intrinsic;
 //
 //-------------
 
-intrinsic Angle(e1::[SpcHypElt], e2::[SpcHypElt] : Precision := 0) -> FldReElt
+intrinsic Angle(e1::[SpcHypAElt], e2::[SpcHypAElt] : Precision := 0) -> FldReElt
   {Given two sequences e1 = [z1,z2] and e2 = [z1,z3], returns
    the angle between the geodesics at z1.}
 
@@ -113,7 +113,7 @@ function CuspidalMidpoint(x,y : Precision := 0)
   return ((x1^2-x2^2)+(y1^2-y2^2))/(2*(x1-x2));
 end function;
 
-intrinsic TangentAngle(x::SpcHypElt, y::SpcHypElt : Precision := 0) -> FldReElt
+intrinsic TangentAngle(x::SpcHypAElt, y::SpcHypAElt : Precision := 0) -> FldReElt
   {The angle of the tangent at x of the geodescic from x to y.}
 
   require Type(Precision) eq RngIntElt and Precision ge 0 :
@@ -156,7 +156,7 @@ end intrinsic;
 //
 //-------------
 
-intrinsic Distance(x::SpcHypElt, y::SpcHypElt : Precision := 0) -> FldReElt
+intrinsic Distance(x::SpcHypAElt, y::SpcHypAElt : Precision := 0) -> FldReElt
   {The hyperbolic distance between the points x and y in the upper half plane.}
   require Type(Precision) eq RngIntElt and Precision ge 0 :
         "Parameter Precision must be a positive integer.";
@@ -200,7 +200,7 @@ end intrinsic;
 //
 //-------------
 
-intrinsic ArithmeticVolume(P::[SpcHypElt] : Precision := 0) -> FldReElt
+intrinsic ArithmeticVolume(P::[SpcHypAElt] : Precision := 0) -> FldReElt
   {The volume of the convex region specified the sequence of elements of
    the upper half-plane.  The volume is normalized "arithmetic" volume,
    so the usual volume is divided by 2*pi; this gives an ideal triangle

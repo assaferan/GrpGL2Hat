@@ -256,6 +256,8 @@ forward EdgeListToFareySymbol;
 forward EdgeListToOtherEdges;
 forward UpdateAttributes;
 
+// This used to assume the group is contained in Gamma_0(2) for no good reason
+
 // each fundamental domain for Gamma_0(2) corresponds to some
 // choice of 3 coset representatives; this gives them.
 
@@ -267,6 +269,20 @@ end function;
 
 // need another coset rep map for -3 edges!!!!
 
+function FareySequenceForIndex2(group)
+    PSL := PSL2(Integers());
+    farey_seq := [Cusps()|Infinity(),0,Infinity()];
+    farey_labels := [-3,-3];
+    S := PSL![-1,-1,1,0];
+    R := PSL![0,1,-1,1];
+    gens := [S,R];
+    other := [];
+    FS := init_farey_seq(farey_seq,farey_labels,gens);
+    FS`group := group;
+    FS`cosets := [PSL!1, PSL![1,0,1,1]];
+    UpdateAttributes(group,FS);
+    return FS;
+end function;
 
 intrinsic FareySymbol(group::GrpGL2Hat,restrictions::SeqEnum) -> SymFry
     {Computes the Farey Symbol of a congruence subgroup in PSL_2(Z).}
@@ -322,15 +338,26 @@ intrinsic FareySymbol(group::GrpGL2Hat,restrictions::SeqEnum) -> SymFry
     if group eq PSL then
 	return FareySequenceForGamma0N(group);
     end if;
+
+    if (Index(group) eq 2) then
+	return FareySequenceForIndex2(group);
+    end if;
     
     // assume for now the index is at least 2,
     // need to change this, as currently won't work in that case
     // (this case does not yet come up though)
     
     boundary := true;
-    edge1 := MakeEdge([Cusps()|Infinity(),0],boundary); // -infinity to 0
-    edge2 := MakeEdge([Cusps()|0,1],     not boundary);	// 0 to 1        
-    edge3 := MakeEdge([Cusps()|1,Infinity()], boundary);// 1 to +infinity
+    // This fix was written according to [KLL07] - Step 2 in algorithm in section 5
+    if PSL![-1,1,-1,0] notin group then
+	edge1 := MakeEdge([Cusps()|Infinity(),0],boundary); // -infinity to 0
+	edge2 := MakeEdge([Cusps()|0,1],     not boundary);	// 0 to 1        
+	edge3 := MakeEdge([Cusps()|1,Infinity()], boundary);// 1 to +infinity
+    else
+	edge1 := MakeEdge([Cusps()|Infinity(),-1],boundary); // -infinity to -1
+	edge2 := MakeEdge([Cusps()|-1,0],     not boundary);	// -1 to 0        
+	edge3 := MakeEdge([Cusps()|0,Infinity()], boundary);// 0 to +infinity
+    end if;
     L := [edge1,edge2,edge3];
     
     generators := [];
@@ -349,7 +376,9 @@ intrinsic FareySymbol(group::GrpGL2Hat,restrictions::SeqEnum) -> SymFry
     end if;
 
     // following assumes index is greater than 2:
+    // Assumes more, assume these are different coset representatives for the group!!
     cosets := CosetImages(PSL!1);
+    // cosets := [PSL![1,0,0,1]];
         
     finished := false;
     i := 2;			
@@ -622,9 +651,8 @@ function spaces(N)
 end function;
 
 
-intrinsic HackobjPrintSymFry(FS::SymFry, level::MonStgElt)
-    {}
-
+intrinsic Print(FS::SymFry, level::MonStgElt)
+ {}
     cuspString := "[ oo, " cat
     &cat[Sprintf("%o, ",c) : c in FS`cusps | c ne Cusps()!Infinity()]
     cat "oo ]";

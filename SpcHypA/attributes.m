@@ -25,15 +25,15 @@ import "creation.m":  HalfPlaneEltQuad;
 /////////////////////////////////////////////////////////////
 
 
-declare type SpcHyp [SpcHypElt];
-declare attributes SpcHyp:
+declare type SpcHypA [SpcHypAElt];
+declare attributes SpcHypA:
    dimension,        //  currently dimension must be 1
    // the following only make sense for dimension 1
    scalar_field;      // for the case of Shimura curves:
    
 
-declare type SpcHypElt;
-declare attributes SpcHypElt:
+declare type SpcHypAElt;
+declare attributes SpcHypAElt:
    is_exact,       //  boolean
    is_cusp,        //  boolean   
    complex_value, //        
@@ -56,13 +56,13 @@ declare attributes SpcHypElt:
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
-intrinsic Print(X::SpcHyp, level::MonStgElt)
+intrinsic Print(X::SpcHypA, level::MonStgElt)
    {}
    printf "Upper half complex plane union cusps";
 end intrinsic;
 
 
-intrinsic Print(x::SpcHypElt, level::MonStgElt)
+intrinsic Print(x::SpcHypAElt, level::MonStgElt)
    {}
    if not x`is_cusp then       
       if x`is_exact then
@@ -102,7 +102,7 @@ end intrinsic;
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
-intrinsic '.' (H::SpcHyp,i::RngIntElt) -> SpcHypElt
+intrinsic '.' (H::SpcHypA,i::RngIntElt) -> SpcHypAElt
     {}    
     require i eq 1 or i eq 2 : "Invalid index.";
     if i eq 1 then
@@ -119,7 +119,7 @@ intrinsic '.' (H::SpcHyp,i::RngIntElt) -> SpcHypElt
 end intrinsic;
 
 
-intrinsic AssignNames(~H::SpcHyp, S::[MonStgElt])
+intrinsic AssignNames(~H::SpcHypA, S::[MonStgElt])
     {Assign names to elliptic points.}
     i := #S;
     require  (i eq 0 or i eq 1 or i eq 2):
@@ -127,7 +127,7 @@ intrinsic AssignNames(~H::SpcHyp, S::[MonStgElt])
 end intrinsic;
 
 
-intrinsic Name(G::SpcHyp,i::RngIntElt) -> GrpGL2HatElt
+intrinsic Name(G::SpcHypA,i::RngIntElt) -> GrpGl2HatElt
   {An elliptic point.}
     require  (i eq 0 or i eq 1 or i eq 2):
     "The length of argument 2 must be at most 2.";

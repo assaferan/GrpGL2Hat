@@ -9,17 +9,17 @@ freeze;
 
 
 
-intrinsic '*' (a::RngElt,x::SpcHypElt) -> SpcHypElt
+intrinsic '*' (a::RngElt,x::SpcHypAElt) -> SpcHypAElt
    {}
    // Multiplication of elements of the upper half plane by
    // some rational.
    // Warning, the following does not really result in something
    // in the upper half plane, but is useful for applying the
-   // action of some congruence subgroup (GrpGL2Hat).
+   // action of some congruence subgroup (GrpPSL2).
    require Type(a) in {FldRatElt,RngIntElt}:
        "Argument 1 must be an integer, rational";
    if a eq 0 then
-      z := New(SpcHypElt);   
+      z := New(SpcHypAElt);   
       z`is_exact     := true;
       z`is_cusp      := true;
       z`complex_value   := 0;
@@ -27,7 +27,7 @@ intrinsic '*' (a::RngElt,x::SpcHypElt) -> SpcHypElt
       z`parent:=x`parent;
       return z;
    end if;
-   z := New(SpcHypElt);   
+   z := New(SpcHypAElt);   
    z`is_exact     := x`is_exact;
    z`is_cusp      := x`is_cusp;     
    z`complex_value   := a*x`complex_value;     
@@ -44,7 +44,7 @@ intrinsic '*' (a::RngElt,x::SpcHypElt) -> SpcHypElt
    return z;
 end intrinsic;
 
-intrinsic '*' (x::SpcHypElt,a::RngElt) -> SpcHypElt
+intrinsic '*' (x::SpcHypAElt,a::RngElt) -> SpcHypAElt
    {}
    // Multiplication of elements of the upper half plane by
    // some rational.
@@ -52,7 +52,7 @@ intrinsic '*' (x::SpcHypElt,a::RngElt) -> SpcHypElt
 end intrinsic;
 
 
-intrinsic '*' (a::RngElt,x::[SpcHypElt]) -> SeqEnum
+intrinsic '*' (a::RngElt,x::[SpcHypAElt]) -> SeqEnum
     {}
     require Type(a) in {FldRatElt,RngIntElt}:
     "Argument 1 must be an integer, rational";
@@ -91,11 +91,11 @@ intrinsic '*' (a::FldRatElt,x::[SetCspElt]) -> SeqEnum
 end intrinsic;
 
 
-intrinsic '+' (x::SpcHypElt,b::RngIntElt) -> SpcHypElt
+intrinsic '+' (x::SpcHypAElt,b::RngIntElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpGL2Hat).
-   z := New(SpcHypElt);
+// action of some congruence subgroup (GrpPSL2).
+   z := New(SpcHypAElt);
    z`is_exact     := x`is_exact;
    z`is_cusp      := x`is_cusp;     
    z`complex_value := b + x`complex_value;     
@@ -110,11 +110,11 @@ intrinsic '+' (x::SpcHypElt,b::RngIntElt) -> SpcHypElt
 end intrinsic;
 
 
-intrinsic '+' (x::SpcHypElt,b::FldRatElt) -> SpcHypElt
+intrinsic '+' (x::SpcHypAElt,b::FldRatElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpGL2Hat).
-   z := New(SpcHypElt);
+// action of some congruence subgroup (GrpPSL2).
+   z := New(SpcHypAElt);
    z`is_exact     := x`is_exact;
    z`is_cusp      := x`is_cusp;     
    z`complex_value := b + x`complex_value;     
@@ -131,23 +131,23 @@ intrinsic '+' (x::SpcHypElt,b::FldRatElt) -> SpcHypElt
 end intrinsic;
 
 
-intrinsic '-' (x::SpcHypElt,b::RngIntElt) -> SpcHypElt
+intrinsic '-' (x::SpcHypAElt,b::RngIntElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpGL2Hat).
+// action of some congruence subgroup (GrpPSL2).
    return x + (-b);
 end intrinsic;
 
 
-intrinsic '-' (x::SpcHypElt,b::FldRatElt) -> SpcHypElt
+intrinsic '-' (x::SpcHypAElt,b::FldRatElt) -> SpcHypAElt
    {}
 // Warning, this is defined for use for giving
-// action of some congruence subgroup (GrpGL2Hat).
+// action of some congruence subgroup (GrpPSL2).
    return x + (-b);
 end intrinsic;
 
 
-intrinsic '/' (x::SpcHypElt,y::RngIntElt) -> SpcHypElt
+intrinsic '/' (x::SpcHypAElt,y::RngIntElt) -> SpcHypAElt
     {division of a point in the upper half plane by
     a positive integer}
     require y gt 0:

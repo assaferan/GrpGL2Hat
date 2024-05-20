@@ -106,7 +106,7 @@ function IToValue(x)
 end function;
 
 
-intrinsic EquivalentPoint(x::SpcHypElt) -> SpcHypElt, GrpGL2HatElt
+intrinsic EquivalentPoint(x::SpcHypAElt) -> SpcHypAElt, GrpGL2HatElt
    {returns a point z equivalent to x under the action of
    PSL(2,Z), which is in the standard fundamental domain
    given by the region -1/2 < x <= 1/2 and |x| >= 1 for
@@ -179,7 +179,7 @@ intrinsic EquivalentPoint(x::SpcHypElt) -> SpcHypElt, GrpGL2HatElt
 end intrinsic;
 
 
-intrinsic IsEquivalent(G::GrpGL2Hat,a::SpcHypElt,b::SpcHypElt)
+intrinsic IsEquivalent(G::GrpGL2Hat,a::SpcHypAElt,b::SpcHypAElt)
    -> BoolElt, GrpGL2HatElt
    {for a congruence subgroup G,
    finds whether the points a and b in the upper half plane
@@ -317,7 +317,7 @@ end intrinsic;
 
 
 
-intrinsic IsEquivalent(G::GrpGL2Hat,a::[SpcHypElt],b::[SpcHypElt])
+intrinsic IsEquivalent(G::GrpGL2Hat,a::[SpcHypAElt],b::[SpcHypAElt])
    -> BoolElt, GrpGL2HatElt
    {For a congruence subgroup G and edges a and b, which are given
    by pairs of cusps, return true or false depending on whether the

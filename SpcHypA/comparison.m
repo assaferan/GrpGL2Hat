@@ -6,18 +6,18 @@ freeze;
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
-intrinsic 'in'(x::.,H::SpcHyp) -> BoolElt
+intrinsic 'in'(x::.,H::SpcHypA) -> BoolElt
    {}
-   if Type(x) eq SpcHypElt then return true; end if;
+   if Type(x) eq SpcHypAElt then return true; end if;
    return false;
 end intrinsic;
  
-intrinsic 'eq' (X::SpcHyp,Y::SpcHyp) -> BoolElt
+intrinsic 'eq' (X::SpcHypA,Y::SpcHypA) -> BoolElt
    {checks whether two hyperbolic spaces have the same dimension}
    return X`dimension eq Y`dimension;
 end intrinsic;
 
-intrinsic 'eq' (x::SpcHypElt,y::SpcHypElt) -> BoolElt
+intrinsic 'eq' (x::SpcHypAElt,y::SpcHypAElt) -> BoolElt
    {}
    if not [x`is_exact,x`is_cusp] eq [y`is_exact,y`is_cusp] then
       return false;
@@ -39,11 +39,11 @@ intrinsic 'eq' (x::SpcHypElt,y::SpcHypElt) -> BoolElt
 end intrinsic;
 
 // note, the following function might not be needed if
-// SpcHypElt was not a HackObj
+// SpcHypAElt was not a HackObj
 // note, forced to use misleading name; this should not be
 // in export version
 
-intrinsic 'lt' (x::SpcHypElt,Y::[SpcHypElt]) -> BoolElt
+intrinsic 'lt' (x::SpcHypAElt,Y::[SpcHypAElt]) -> BoolElt
    {}
    found := false;
    i := 1;

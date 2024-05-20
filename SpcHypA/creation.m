@@ -8,33 +8,33 @@ freeze;
 
 // creation of the upper half plane:
 
-intrinsic UpperHalfPlane() -> SpcHyp
+intrinsic UpperHalfPlane() -> SpcHypA
     {The set of points in the complex plane which are
     rational or have positive imaginary part, together
     with infinity.}
-    H := New(SpcHyp); 
+    H := New(SpcHypA); 
     H`dimension := 1;
     return H;
 end intrinsic;
 
-intrinsic UpperHalfPlaneWithCusps() -> SpcHyp
+intrinsic UpperHalfPlaneWithCusps() -> SpcHypA
    {Don't use this -- use UpperHalfPlane instead.}
    return UpperHalfPlane();
 end intrinsic;
    
-intrinsic UpperHalfPlaneUnionCusps() -> SpcHyp
+intrinsic UpperHalfPlaneUnionCusps() -> SpcHypA
    {Don't use this -- use UpperHalfPlane instead.}
    return UpperHalfPlane();
 end intrinsic; 
 
 
-intrinsic UpperHalfPlane(G::GrpGL2Hat) -> SpcHyp
+intrinsic UpperHalfPlane(G::GrpGL2Hat) -> SpcHypA
     {For internal use.}
 
     require assigned G`EichlerOrder:
         "Argument 1 must have an Eichler order";
     f := G`MatrixRepresentation;
-    H := New(SpcHyp); 
+    H := New(SpcHypA); 
     H`dimension := 1;
     H`scalar_field := BaseRing(Codomain(f));
     H`discriminants := [];
@@ -48,10 +48,10 @@ end intrinsic;
 // following functions are called by the coercions below.
 
 function HalfPlaneEltReal(X,x)
-   // X::SpcHyp,x::FldComElt) -> SpcHypElt
+   // X::SpcHypA,x::FldComElt) -> SpcHypAElt
     error if Imaginary(x) lt 0, "Second argument must have non
     negative imaginary part";
-    z := New(SpcHypElt);
+    z := New(SpcHypAElt);
     z`is_exact := false;
     z`is_cusp  := false;
     z`complex_value := x;
@@ -61,8 +61,8 @@ function HalfPlaneEltReal(X,x)
 end function;
 
 function HalfPlaneEltCusp(X,x)
-   // (X::SpcHyp,x::SetCspElt) -> SpcHypElt
-    z := New(SpcHypElt);
+   // (X::SpcHypA,x::SetCspElt) -> SpcHypAElt
+    z := New(SpcHypAElt);
     z`is_exact := true;
     z`is_cusp  := true;
     u,v:= Explode(Eltseq(x));
@@ -75,7 +75,7 @@ function HalfPlaneEltCusp(X,x)
 end function;
 
 function HalfPlaneEltRat(X,x)
-   // X::SpcHyp,x::FldRatElt) -> SpcHypElt
+   // X::SpcHypA,x::FldRatElt) -> SpcHypAElt
     return HalfPlaneEltCusp(X,Cusps()!x);
 end function;
 
@@ -84,8 +84,8 @@ end function;
 // temporarilty kept for reference
 
 function HalfPlaneEltQuad(X,x)
-   // X::SpcHyp,x::FldQuadElt) -> SpcHypElt
-    z := New(SpcHypElt);
+   // X::SpcHypA,x::FldQuadElt) -> SpcHypAElt
+    z := New(SpcHypAElt);
     z`is_exact := true;
     z`is_cusp  := false;
     C := ComplexField();
@@ -121,7 +121,7 @@ end function;
 function HalfPlaneFldQuadElt(X,x)
     // Constructor for FldQuad -- supporting automatic coercion
     // into the complex field and using a generator of trace 0.
-    z := New(SpcHypElt);
+    z := New(SpcHypAElt);
     z`is_exact := true;
     // note, if the imaginary part is zero,
     // something is still not a cusp unless it's rational.
@@ -180,8 +180,8 @@ end function;
 
    
 function HalfPlaneEltBiQuad(X,x)
-   // (X::SpcHyp,x::FldNumElt) -> SpcHypElt
-    z := New(SpcHypElt);
+   // (X::SpcHypA,x::FldNumElt) -> SpcHypAElt
+    z := New(SpcHypAElt);
     z`is_exact := true;
     z`is_cusp  := false;
     C := ComplexField();
@@ -242,15 +242,15 @@ end function;
 //                                                            //
 //                     Coercions                              //
 // from:                                                      //
-// SpcHypElt, SetCspElt, FldComElt,  FldRatElt, FldNumElt.     // 
+// SpcHypAElt, SetCspElt, FldComElt,  FldRatElt, FldNumElt.     // 
 ////////////////////////////////////////////////////////////////
 
 forward comparable;
 
-intrinsic IsCoercible(X::SpcHyp,x::.) -> BoolElt, SpcHypElt
+intrinsic IsCoercible(X::SpcHypA,x::.) -> BoolElt, SpcHypAElt
     {}
     case Type(x):
-      when SpcHypElt:
+      when SpcHypAElt:
          return true, x;
       when SetCspElt:
          return true, HalfPlaneEltCusp(X,x);
@@ -355,7 +355,7 @@ end function;
 //                                                                    //
 ////////////////////////////////////////////////////////////////////////
 
-intrinsic RootOfUnity(H::SpcHyp,n::RngIntElt) -> SpcHypElt
+intrinsic RootOfUnity(H::SpcHypA,n::RngIntElt) -> SpcHypAElt
     {An nth root of unit in H, where n is in 3, 4, or 6.}
     require n in {3,4,6} : "Argument 2 must be 3, 4, or 6.";
     P := PolynomialRing(Integers());

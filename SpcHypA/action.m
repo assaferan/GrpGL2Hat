@@ -1,6 +1,6 @@
 freeze;
 
-intrinsic Stabilizer(a::SpcHypElt,G::GrpGL2Hat) -> GrpGL2HatElt
+intrinsic Stabilizer(a::SpcHypAElt,G::GrpGL2Hat) -> GrpGL2HatElt
    {returns a generator of the stabilizer subgroup of a in G}
    // we will make some assumptions about the point:
    require IsExact(a): "stabilizers are only computed for exact

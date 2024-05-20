@@ -7,12 +7,12 @@ freeze;
 ////////////////////////////////////////////////////////////////////
 
 
-intrinsic Parent(x::SpcHypElt) -> SpcHyp
+intrinsic Parent(x::SpcHypAElt) -> SpcHypA
    {}
    return x`parent;
 end intrinsic;
 
-intrinsic  ScalarField(H::SpcHyp) -> Fld
+intrinsic  ScalarField(H::SpcHypA) -> Fld
     {returns the field over which the matrices of H are defined}
     if assigned H`scalar_field then
 	return H`scalar_field;
@@ -22,7 +22,7 @@ intrinsic  ScalarField(H::SpcHyp) -> Fld
 end intrinsic;
 
 
-intrinsic ExactValue(x::SpcHypElt) -> .
+intrinsic ExactValue(x::SpcHypAElt) -> .
     {For x an element of the upperhalf plane, if x is a cusp,
     returns the value of x as an object of type SetCspElt;
     if x has an exact value in a quadratic extension, returns

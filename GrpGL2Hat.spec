@@ -16,5 +16,10 @@
   misc.m
   words_for_matrices.m
   words_for_matricesSL2.m
+
+  SpcHypA
+  {
+      spec
+  }
 }
 

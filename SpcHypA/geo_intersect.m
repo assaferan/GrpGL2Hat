@@ -70,7 +70,7 @@ function complexintersectionInfinity(real,edge,H)
 end function;
    
 
-intrinsic GeodesicsIntersection(x::[SetCspElt],y::[SetCspElt],H::SpcHyp)
+intrinsic GeodesicsIntersection(x::[SetCspElt],y::[SetCspElt],H::SpcHypA)
    -> SeqEnum
    {computes the intersection in the upper
    half plane of the two geodesics x, y,
@@ -147,7 +147,7 @@ end intrinsic;
 // given a geodesic (x1,x2), finds points (y1,y2) in R such
 // that (y1,y2) extends (x1,x2) to the real axis. 
 
-intrinsic ExtendGeodesic(z::[SpcHypElt],H::SpcHyp) -> SeqEnum
+intrinsic ExtendGeodesic(z::[SpcHypAElt],H::SpcHypA) -> SeqEnum
    {returns a geodesic with end points in R which extends the
    geodesic given by the first argument}
    // note that if any end point is infinity, it is the first
@@ -172,7 +172,7 @@ intrinsic ExtendGeodesic(z::[SpcHypElt],H::SpcHyp) -> SeqEnum
    return [H!(c-r),H!(c+r)];
 end intrinsic;
 
-intrinsic GeodesicsIntersection(x::[SpcHypElt],y::[SpcHypElt],H::SpcHyp) -> SeqEnum
+intrinsic GeodesicsIntersection(x::[SpcHypAElt],y::[SpcHypAElt],H::SpcHypA) -> SeqEnum
    {computes the intersection in the upper
    half plane of the two geodesics x, y,
    where x and y are specified by their end points.

@@ -211,7 +211,7 @@ end function;
 //                                                 //
 //  Functions for finding elliptic points          //
 //  of a congruence                                //
-//  asubgroup and their widths                     //
+//  subgroup and their widths                     //
 //                                                 //
 /////////////////////////////////////////////////////
 
