@@ -165,3 +165,11 @@ procedure testIsGammaShimura(N)
 	end for;
     end for;
 end procedure;
+
+intrinsic HasSurjectiveDeterminant(G::GrpGL2Hat) -> BoolElt
+{}
+  if G`IsOfGammaType then
+      return true;
+  end if;
+  return #Domain(G`DetRep) eq EulerPhi(Level(G));
+end intrinsic;
