@@ -909,11 +909,16 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
      coset_idx := map<cosets -> codom |
        [<cosets[i], codom[i] > : i in [1..#cosets]] >;
      H`FindCoset := find_coset*coset_idx;
-     // det_cosets := Transversal(H0, H`ImageInLevel);
-     det_cosets := Image(det_hom);
-     dom := [x[1,1] : x in det_cosets];
-     //     H`DetRep := map< dom -> H0 | [<Determinant(x),x> : x in det_cosets] >;
-     H`DetRep := map< dom -> H0 | [<x[1,1],x@@det_hom> : x in det_cosets] >;
+     // In the case N eq 1, we leave it as it was - coudl an dshould do better but not now
+     if (N eq 1) then
+	 det_cosets := Transversal(H0, H`ImageInLevel);
+	 dom := [Determinant(x) : x in det_cosets];
+	 H`DetRep := map< dom -> H0 | [<Determinant(x),x> : x in det_cosets] >;
+     else
+	 det_cosets := Image(det_hom);
+	 dom := [x[1,1] : x in det_cosets];
+	 H`DetRep := map< dom -> H0 | [<x[1,1],x@@det_hom> : x in det_cosets] >;
+     end if;
      if IsExactLevel then
         H`Level := N;
      else
