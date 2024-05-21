@@ -910,7 +910,7 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
        [<cosets[i], codom[i] > : i in [1..#cosets]] >;
      H`FindCoset := find_coset*coset_idx;
      // det_cosets := Transversal(H0, H`ImageInLevel);
-     det_cosets := Transversal(gl1, Image(det_hom));
+     det_cosets := Image(det_hom);
      dom := [x[1,1] : x in det_cosets];
      //     H`DetRep := map< dom -> H0 | [<Determinant(x),x> : x in det_cosets] >;
      H`DetRep := map< dom -> H0 | [<x[1,1],x@@det_hom> : x in det_cosets] >;
