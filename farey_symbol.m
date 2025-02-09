@@ -385,6 +385,7 @@ intrinsic FareySymbol(group::GrpGL2Hat,restrictions::SeqEnum) -> SymFry
 
     // There is still some bug here.
     // This does not always terminate for some reason.
+    vprintf ModularSymbols, 2 : "Computing generators for group using Farey symbols. Out of %o cosets, recovered ", Index(group);
     while not finished do
 	e := L[i];
 	mat := Mat(e : PSL:=PSL);
@@ -415,6 +416,7 @@ intrinsic FareySymbol(group::GrpGL2Hat,restrictions::SeqEnum) -> SymFry
 		Append(~cosets,newcosets[1]);
 		Append(~cosets,newcosets[2]);
 		Append(~cosets,newcosets[3]);
+		vprintf ModularSymbols, 2 : "%o ", #cosets;
 	    end if;
 	end if;
 	if AllEdgesLinked(L) then
@@ -429,6 +431,7 @@ intrinsic FareySymbol(group::GrpGL2Hat,restrictions::SeqEnum) -> SymFry
 	end if;
 	i +:=1;
     end while;
+    vprintf ModularSymbols, 2 : "\n";
     
     fareysymbol:= EdgeListToFareySymbol(L);
     otheredges := EdgeListToOtherEdges(L);
