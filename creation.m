@@ -565,6 +565,58 @@ end intrinsic;
 //                                                      //
 //////////////////////////////////////////////////////////
 
+function slow_conjugate(G, A, IsExactLevel)
+  gens := Generators(G);
+  det := Integers()!Determinant(A);
+  H_gens := [];
+  for g in gens do
+      elt := A^(-1) * GL(2,Rationals())!Eltseq(g) * A;
+      new_g := PSL2(Integers())!Eltseq(elt);
+      Append(~H_gens, new_g);
+  end for;
+  gens_level := [Eltseq(h) : h in H_gens];// cat [[-1,0,0,-1]];
+  mod_level := ModLevel(G);
+  mod_level := SL(2, Integers(Level(G) * det));
+  im_in_level := sub<mod_level | gens_level >;
+  return PSL2Subgroup(im_in_level, IsExactLevel);
+end function;
+  
+// Faster than before, could still use improvements
+// Perhaps compute level of conjugation a priori,
+// by checking conjugating kernels
+function fast_conjugate(G, A, IsExactLevel)
+    N := Level(G);
+    det := Integers()!Determinant(A);
+    M2Z := MatrixAlgebra(Integers(),2);
+    // notation from here on assumes det = p is prime
+    GN := ImageInLevelGL(G);
+    // GpN := ImageInLevelGL(G : N := det*N); 
+    // The above line is slow. check why we are not simply lifting
+    lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
+		   eps in CartesianPower([0..det^2-1],4)] : g in Generators(GN)];
+    // !! TODO : Not sure that we really need det^2 here, check that
+    GpN := sub<GL(2, Integers(det^2*N)) | lifts>;
+    AmodpN := MatrixAlgebra(Integers(det^2*N),2)!A;
+    Atilde_modpN := Adjoint(AmodpN);
+    gens := [Atilde_modpN*g*AmodpN : g in Generators(GpN)];
+    assert &and[&and[(Integers()!x) mod det eq 0  
+		     : x in Eltseq(g)] : g in gens];
+    lifts := [GL(2,Integers(det*N))!
+		 [(Integers()!x) div det : x in Eltseq(g)] 
+		 : g in gens];
+    /*
+    lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
+		   eps in CartesianPower([0..det-1],4)] : 
+		  g in im_mod_N];
+   */
+    conj_mod_pN := sub<GL(2, Integers(det*N)) | lifts>;
+    ret := PSL2Subgroup(conj_mod_pN, IsExactLevel);
+    // Not equal because ret_slow only sees the PSL2 subgroup (det eq 1)
+    // ret_slow := slow_conjugate(G, A, IsExactLevel);
+    // assert ret eq ret_slow;
+    return ret;
+end function;
+
 intrinsic Conjugate(G::GrpGL2Hat, A::GrpMatElt : IsExactLevel := false) -> GrpGL2Hat
 {This function returns the conjugation of G by A, i.e. A^(-1)*G*A
      At the moment we only support the case where
@@ -608,23 +660,52 @@ intrinsic Conjugate(G::GrpGL2Hat, A::GrpMatElt : IsExactLevel := false) -> GrpGL
   // At the moment we always calculate generators
   // If they have not been calculated yet, can add later more efficient
   // methods
-  gens := Generators(G);
-  H_gens := [];
-  for g in gens do
-      elt := A^(-1) * GL(2,Rationals())!Eltseq(g) * A;
-      new_g := PSL2(Integers())!Eltseq(elt);
-      Append(~H_gens, new_g);
-  end for;
-  gens_level := [Eltseq(h) : h in H_gens];// cat [[-1,0,0,-1]];
-  mod_level := ModLevel(G);
-  mod_level := SL(2, Integers(Level(G) * det));
-  im_in_level := sub<mod_level | gens_level >;
-  return PSL2Subgroup(im_in_level, IsExactLevel);
+  // return slow_conjugate(G, A, IsExactLevel);
+  return fast_conjugate(G, A, IsExactLevel);
 end intrinsic;
 
 intrinsic '^'(G::GrpGL2Hat, A::GrpMatElt) -> GrpGL2Hat
 {}
   return Conjugate(G,A);
+end intrinsic;
+
+// sometimes G^A is not in GL_2(Zhat), but we still want to compute
+// G^A meet G in GL_2(Zhat). The following intrinsic does that
+intrinsic MeetConjugate(G::GrpGL2Hat, A::GrpMatElt) -> GrpGL2Hat
+{}
+   M2Z := MatrixAlgebra(Integers(),2);
+   GL2Q := GL(2, Rationals());
+   D := Rationals()!LCM([Denominator(x) : x in Eltseq(A^(-1))]);
+   A_tilde := M2Z!(ScalarMatrix(2,D) * A^(-1));
+   r , dummy , t := SmithForm(M2Z!A_tilde);
+   gamma1_conj := GammaUpper0(r[2,2] div r[1,1]);
+
+   gamma1_A_conj := Conjugate(gamma1_conj, GL2Q!t^(-1));
+
+/*
+  // verify that this is indeed the A*Gamma(1)*A^(-1) meet Gamma(1)
+  gens := [GL2Q!Eltseq(g) : g in Generators(gamma1_A_conj)];
+  assert &and[IsCoercible(M2Z,A^(-1)*g*A) : g in gens];
+  assert Index(gamma1_A_conj) eq #gamma1_reps;
+*/
+
+   G_A_conj := Conjugate(G meet gamma1_A_conj, A);
+
+/*
+  // verify that this is contained in A^(-1)*G*A meet Gamma(1)
+  // This suggests that here we don't have the full intersection
+  gens := [GL2Q!Eltseq(g) : g in Generators(gamma_A_conj)];
+  assert &and[A*g*A^(-1) in G : g in gens];
+*/
+
+  H := G meet G_A_conj;
+
+/*
+  // Check that H is contained in A^(-1)*G*A
+  gens := [GL2Q!Eltseq(g) : g in Generators(H)];
+  assert &and[A*g*A^(-1) in G : g in gens];
+*/
+  return H;
 end intrinsic;
 
 // This was the only way I could get the reduction morphism
