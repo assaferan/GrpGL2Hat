@@ -990,16 +990,18 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
 	 // H`ImageInLevel := H0 meet H`ModLevel;
 	 // Computing the kernel of the determinant map seems to be slightly faster
 
-//"H0 mag:", H0: Magma;
+// "H0 mag:", H0: Magma;
 
-	 gl := Generic(H0);
-	 gens := Generators(H0);
-	 k := 3;
-	 repeat
-	    HH:=sub<gl|[Random(gens): i in [1..k]]>;
-	    k +:= 1;
-	 until forall{h: h in gens | h in HH};
-	 H0 := HH;
+	 if Ngens(H0) gt 1 then
+	     gl := Generic(H0);
+	     gens := Generators(H0);
+	     k := 3;
+	     repeat
+		HH:=sub<gl|[Random(gens): i in [1..k]]>;
+		k +:= 1;
+	     until forall{h: h in gens | h in HH};
+	     H0 := HH;
+	 end if;
 
 //"Smaller H0:", H0;
 
