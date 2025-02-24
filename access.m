@@ -157,9 +157,19 @@ intrinsic GetFindCoset(G::GrpGL2Hat) -> Map
     else
       G`FS_cosets := [PSL2(BaseRing(G)) | FindLiftToSL2(c) : c in cosets];
     end if;
+
     codom := [<i, cosets[i]^(-1)> : i in [1..#cosets]];
-    coset_idx := map<cosets -> codom |
-       [<cosets[i], codom[i] > : i in [1..#cosets]] >;
+    if 1 eq 1 then
+	A := AssociativeArray();
+	for i in [1..#cosets] do
+	    A[cosets[i]] := codom[i];
+	end for;
+	coset_idx := map<cosets -> Universe(codom) | x :-> A[x]>;
+    else
+	coset_idx := map<cosets -> codom |
+	   [<cosets[i], codom[i] > : i in [1..#cosets]] >;
+    end if;
+
     G`FindCoset := find_coset*coset_idx;
     det_cosets := Transversal(ImageInLevelGL(G), ImageInLevel(G));
     dom := [Determinant(x) : x in det_cosets];

@@ -6,6 +6,8 @@ freeze;
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
+// PSL2Z := PSL2(IntegerRing());
+
 import "../ModSymA/core.m" : CosetReduce, ManinSymbolGenList;
 import "misc.m" : NormalizerGrpMat;
 
@@ -54,6 +56,8 @@ function init_psl2_group_char(N,R,char)
     G`character_list := [char];
     return G;
 end function;
+
+declare attributes Rng: StorePSL2;
  
 intrinsic PSL2(R::Rng) -> GrpGL2Hat
     {The projective special linear matrix group PSL(2,R).}
@@ -63,7 +67,12 @@ intrinsic PSL2(R::Rng) -> GrpGL2Hat
     if Type(R) eq FldQuad then
 	require Discriminant(R) gt 0: "The Argument must be a ring contained in the reals";
     end if;
-     
+
+    if assigned R`StorePSL2 then
+	return R`StorePSL2;
+    end if;
+//"GET PSL2 HARD:", R;
+
     G := init_psl2_group(1,R);
     G`BaseRing := R;
     G`Level := 1;
@@ -76,6 +85,8 @@ intrinsic PSL2(R::Rng) -> GrpGL2Hat
        G`Generators := [T,S];
     end if;
     G`conjugate_list:=[GL(2,R)!1];
+
+    R`StorePSL2 := G;
     return G;
 end intrinsic;
 
@@ -595,14 +606,33 @@ function fast_conjugate(G, A, IsExactLevel)
     lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
 		   eps in CartesianPower([0..det^2-1],4)] : g in Generators(GN)];
     // !! TODO : Not sure that we really need det^2 here, check that
-    GpN := sub<GL(2, Integers(det^2*N)) | lifts>;
+
+/*
+"SUBG mod:", Factorization(det^2*N);
+"#lifts:", #lifts;
+lifts := Set(lifts);
+"new #lifts:", #lifts;
+//"lifts:", lifts;
+time     GpN := sub<GL(2, Integers(det^2*N)) | lifts>;
+"Get order:";
+time #GpN;
+*/
+
+R := Integers(det^2*N);
+//gl := GL(2, Integers(det^2*N));
+//gl;
+//Universe(lifts);
+MR := MatrixRing(R, 2);
+gens := {MR ! x: x in lifts};
+
     AmodpN := MatrixAlgebra(Integers(det^2*N),2)!A;
     Atilde_modpN := Adjoint(AmodpN);
-    gens := [Atilde_modpN*g*AmodpN : g in Generators(GpN)];
-    assert &and[&and[(Integers()!x) mod det eq 0  
-		     : x in Eltseq(g)] : g in gens];
+    //gens := [Atilde_modpN*g*AmodpN : g in Generators(GpN)];
+    gens := [Atilde_modpN*g*AmodpN : g in gens];
+//    assert &and[&and[(Integers()!x) mod det eq 0  : x in Eltseq(g)] : g in gens];
+    Z := Integers();
     lifts := [GL(2,Integers(det*N))!
-		 [(Integers()!x) div det : x in Eltseq(g)] 
+		 [(Z!x) div det : x in Eltseq(g)] 
 		 : g in gens];
     /*
     lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
@@ -959,9 +989,29 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
      else
 	 // H`ImageInLevel := H0 meet H`ModLevel;
 	 // Computing the kernel of the determinant map seems to be slightly faster
+
+//"H0 mag:", H0: Magma;
+
+	 gl := Generic(H0);
+	 gens := Generators(H0);
+	 k := 3;
+	 repeat
+	    HH:=sub<gl|[Random(gens): i in [1..k]]>;
+	    k +:= 1;
+	 until forall{h: h in gens | h in HH};
+	 H0 := HH;
+
+//"Smaller H0:", H0;
+
 	 gl1 := GL(1, Integers(N));
+//"H0:", H0;
+//"gl1:", gl1;
+//"rhs im:", [gl1![[Determinant(H0.i)]]: i in [1..Ngens(H0)]];
+//"Get hom"; time
 	 det_hom := hom<H0 -> gl1 | [gl1![[Determinant(H0.i)]]: i in [1..Ngens(H0)]]>;
+//"Get ker"; time
 	 H`ImageInLevel := Kernel(det_hom);
+//"GOT ker:", H`ImageInLevel;
 	 H`ImageInLevelGL := H0;
      end if;
      H`Level := N;
@@ -986,9 +1036,19 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
 	 end if;
 	 H`FS_cosets := [G | FindLiftToSL2(find_coset(c)) : c in pcosets];
      end if;
-     codom := [<i, cosets[i]^(-1)> : i in [1..#cosets]];
-     coset_idx := map<cosets -> codom |
-       [<cosets[i], codom[i] > : i in [1..#cosets]] >;
+
+    codom := [<i, cosets[i]^(-1)> : i in [1..#cosets]];
+    if 1 eq 1 then
+        A := AssociativeArray();
+        for i in [1..#cosets] do
+            A[cosets[i]] := codom[i];
+        end for;
+        coset_idx := map<cosets -> Universe(codom) | x :-> A[x]>;
+    else
+        coset_idx := map<cosets -> codom |
+           [<cosets[i], codom[i] > : i in [1..#cosets]] >;
+    end if;
+
      H`FindCoset := find_coset*coset_idx;
      // In the case N eq 1, we leave it as it was - coudl an dshould do better but not now
      if (N eq 1) then
