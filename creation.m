@@ -978,6 +978,9 @@ end function;
 intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
 			  IsExactLevel::BoolElt : CosetReps := [], FindCoset := false) -> GrpGL2Hat
 {returns the subgroup of G generated whose image is H0.}
+
+//"RUN SubgroupFromMod"; "G:", G; TES(G);
+
      H := New(GrpGL2Hat);
      H`MatrixGroup := G`MatrixGroup;
      H`BaseRing := G`BaseRing;
@@ -1017,6 +1020,17 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
 	 H`ImageInLevelGL := H0;
      end if;
      H`Level := N;
+
+/*
+"HERE H`Level:", H`Level;
+"HERE H`ModLevel:", #H`ModLevel;
+"Base Ring:", BaseRing(H`ModLevel);
+"HERE H`ImageInLevelGL:", #H`ImageInLevelGL;
+"HERE H`ImageInLevel:", #H`ImageInLevel;
+"HERE quot:", #H`ImageInLevelGL / #H`ImageInLevel;
+*/
+
+     cosets, find_coset := Transversal(H`ModLevel, H`ImageInLevel);
      // Drew suggested that computing the transversal in GL_2 would be faster
      // when the determinant is surjective, but tests seem to indicate differently.
      // Should see if we can postpone computing these until they are needed.
@@ -1051,7 +1065,55 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
            [<cosets[i], codom[i] > : i in [1..#cosets]] >;
     end if;
 
-     H`FindCoset := find_coset*coset_idx;
+    HH := H`ModLevel;
+
+    m := find_coset*coset_idx;
+
+om := m;
+//"om:", om; "om CODOM:", Codomain(om);
+
+INFO := 0 eq 1;
+
+    if 1 eq 1 then
+	if #HH le 10^5 then
+	    A := AssociativeArray();
+	    if INFO then
+		"[";
+		IndentPush();
+		printf "SubgroupFromMod (L %o): USE Assoc for HH of order %o\n",
+		    #BaseRing(HH), #HH;
+		time for h in HH do
+		    A[h] := m(h);
+		end for;
+	    else
+		for h in HH do
+		    A[h] := m(h);
+		end for;
+	    end if;
+	    if INFO then
+		IndentPop();
+		"]";
+	    end if;
+	    m := map<(HH) -> Universe(codom) | x :-> A[x]>;
+	    //m := map<(HH) -> (codom) | x :-> A[x]>;
+	else
+	    if INFO then
+	      printf "SubgroupFromMod (L %o): SKIP Assoc for HH of order %o\n",
+		    #BaseRing(HH), #HH;
+	    end if;
+	end if;
+    end if;
+//"new m:", m; "new m CODOM:", Codomain(m);
+
+//assert Codomain(m) eq Codomain(om);
+
+//"om IMAGE:", Image(om); "m IMAGE:", Image(om);
+
+     H`FindCoset := om;
+     H`FindCosetQ := m;
+
+//"SET H`FindCoset:", H`FindCoset;
+
      // In the case N eq 1, we leave it as it was - coudl an dshould do better but not now
      if (N eq 1) then
 	 det_cosets := Transversal(H0, H`ImageInLevel);
@@ -1077,8 +1139,37 @@ intrinsic SubgroupFromMod(G::GrpGL2Hat, N::RngIntElt, H0::GrpMat,
      return H;
 end intrinsic;
 
+DO_STORE := 1 eq 1;
+
+declare attributes Rng: A;
+Z := IntegerRing();
+GET_STORE := func< | Z>;
+STORE := GET_STORE();
+STORE`A := AssociativeArray();
+
 intrinsic PSL2Subgroup(H::GrpMat, IsExactLevel::BoolElt : CosetReps := [], FindCoset := false) -> GrpGL2Hat
  {returns a subgroup of PSL2(Z) whose image is H (assumes -I in H)}
+
+ /*
+ "CALL PSL2Subgroup";
+ H: Minimal;
+ "TES(H):"; TES(H);
+ "Hash gens:", Hash(Generators(H));
+ //Traceback();
+ */
+
+    if DO_STORE then
+	STORE := GET_STORE();
+	A := STORE`A;
+	g := {Matrix(Z, x): x in Generators(H)};
+	t := < #BaseRing(H), Hash(g), g >;
+//if #A gt 0 then "UNIV:", Universe(A); end if; "HERE t:", t;
+	if IsDefined(A, t) then
+//"   REUSE";
+	    return A[t];
+	end if;
+    end if;
+
      require Type(BaseRing(H)) eq RngIntRes : "Image group must be Z/NZ";
      if Dimension(H) eq 1 then
 	 return Gamma0(1);
@@ -1087,7 +1178,16 @@ intrinsic PSL2Subgroup(H::GrpMat, IsExactLevel::BoolElt : CosetReps := [], FindC
      // This check takes too long to verify
      // require GL(2,BaseRing(H))![-1,0,0,-1] in H : "Currently assume -I in H";
      N := Modulus(BaseRing(H));   
-     return SubgroupFromMod(PSL2(Integers()), N, H, IsExactLevel : CosetReps := CosetReps, FindCoset := FindCoset);
+
+     S := SubgroupFromMod(PSL2(Integers()), N, H, IsExactLevel : CosetReps := CosetReps, FindCoset := FindCoset);
+
+    if DO_STORE then
+	STORE`A := 0;
+	A[t] := S;
+	STORE`A := A;
+    end if;
+
+     return S;
 end intrinsic;
 
 intrinsic PSL2Subgroup(H::GrpMat: CosetReps := [], FindCoset := false) -> GrpGL2Hat

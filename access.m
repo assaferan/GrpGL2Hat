@@ -6,6 +6,8 @@ freeze;
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
+DUMP := 0 eq 1;
+
 declare attributes GrpGL2HatElt : MatrixH, MatrixD, MatrixDCenter;
 
 intrinsic BaseRing(G::GrpGL2Hat) -> Rng
@@ -150,7 +152,18 @@ end intrinsic;
 intrinsic GetFindCoset(G::GrpGL2Hat) -> Map
 {.}
   if not assigned G`FindCoset then
+
+/*
+"*** GetFindCoset"; "G:", G;
+"TES G:", G;
+"ModLevel(G):", ModLevel(G): Minimal;
+"ImageInLevel(G):", ImageInLevel(G): Minimal;
+*/
+
     cosets, find_coset := Transversal(ModLevel(G), ImageInLevel(G));
+
+//"GetFindCoset ORDERS,#Tr:", #ModLevel(G), #ImageInLevel(G), #cosets;
+
     N := Level(G);
     if N eq 1 then
       G`FS_cosets := [PSL2(BaseRing(G))!1];
@@ -164,19 +177,56 @@ intrinsic GetFindCoset(G::GrpGL2Hat) -> Map
 	for i in [1..#cosets] do
 	    A[cosets[i]] := codom[i];
 	end for;
-	coset_idx := map<cosets -> Universe(codom) | x :-> A[x]>;
+	coset_idx := map<Universe(cosets) -> Universe(codom) | x :-> A[x]>;
     else
 	coset_idx := map<cosets -> codom |
 	   [<cosets[i], codom[i] > : i in [1..#cosets]] >;
     end if;
 
-    G`FindCoset := find_coset*coset_idx;
+    m := find_coset*coset_idx;
+om := m;
+    GG := ModLevel(G);
+
+/*
+"find_coset:", find_coset;
+"";
+
+"orig m:", m;
+"orig m codom:", Codomain(m);
+"";
+*/
+
+    if 1 eq 1 and #GG le 10^5 then
+	A := AssociativeArray();
+	for g in GG do
+	    A[g] := m(g);
+	end for;
+	m := map<(GG) -> Universe(codom) | x :-> A[x]>;
+	//m := map<(GG) -> (codom) | x :-> A[x]>;
+
+//rand := Random(GG); "rand:", rand; "im:", m(rand);
+	//assert m(rand) eq om(rand);
+
+//"GG:", GG; "new m:", m;
+    end if;
+
+// "final m codom:", Codomain(m); "m TES:"; TES(m); "ORIG G TES:"; TES(G);
+
+    G`FindCoset := om;
+    G`FindCosetQ := m;
+
     det_cosets := Transversal(ImageInLevelGL(G), ImageInLevel(G));
     dom := [Determinant(x) : x in det_cosets];
     G`DetRep := map< dom -> ImageInLevelGL(G) |
      [<Determinant(x),x> : x in det_cosets] >;
   end if;
-  return G`FindCoset;
+
+  /*
+  if assigned G`FindCosetQ then
+      return G`FindCosetQ;
+  end if;
+  */
+  return G`FindCoset, G`FindCosetQ;
 end intrinsic;
 
 intrinsic NSCartanV(G::GrpGL2Hat) -> RngIntResElt

@@ -18,6 +18,7 @@ declare type GrpGL2Hat [GrpGL2HatElt];
 declare attributes GrpGL2Hat:
    Label, // for printing purposes
    FindCoset, // A map to a transveral representatives in SL(2,Z/NZ)
+   FindCosetQ, // Quick version when relevant???
    DetRep, //  A map from (Z/NZ)^* to elements in the group's image in
            // GL(2,Z/NZ)
            // having the same determinant
