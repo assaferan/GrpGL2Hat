@@ -10,6 +10,7 @@ freeze;
 
 import "../ModSymA/core.m" : CosetReduce, ManinSymbolGenList;
 import "misc.m" : NormalizerGrpMat;
+import "access.m" : set_up_det_map;
 
 intrinsic GetRealConjugate(H::GrpMat) -> GrpMat
 {Returns a conjugate group in GL(N) that is of real type. (conjugated by [1,0,0,-1])}
@@ -601,10 +602,86 @@ function fast_conjugate(G, A, IsExactLevel)
     M2Z := MatrixAlgebra(Integers(),2);
     // notation from here on assumes det = p is prime
     GN := ImageInLevelGL(G);
+
+/*
+"fast_conjugate G:", G;
+"fast_conjugate A:", A;
+"fast_conjugate GN:", GN;
+"fast_conjugate N:", N;
+"fast_conjugate det:", det;
+*/
+
+    if Ngens(GN) gt 1 then
+	for t := 1 to 100 do
+	    H := sub<GN | Random(GN)>;
+	    if #H eq #GN then
+		GN := H;
+		"Replace GN with 1 gen:"; GN;
+		break;
+	    end if;
+	end for;
+    end if;
+
+    AmodpN := MatrixAlgebra(Integers(det^2*N),2)!A;
+    Atilde_modpN := Adjoint(AmodpN);
+
+/*
+"AmodpN:", AmodpN;
+"Atilde_modpN:", Atilde_modpN;
+"#cart:", det^8;
+"FULL SIZE:", det^8*#Generators(GN);
+*/
+
+    Z := Integers();
+
+    if 1 eq 1 then
+
+    if 0 eq 1 then
+    // ORIG:
+    lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
+		   eps in CartesianPower([0..det^2-1],4)] : g in Generators(GN)];
+    gens := (lifts);
+    gens := [Atilde_modpN*g*AmodpN : g in gens];
+
+    lifts := [GL(2,Integers(det*N))!
+		 [ExactQuotient(Z!x, det): x in Eltseq(g)] 
+		 : g in gens];
+
+    else
+
+    GNgens := [M2Z | Matrix(g): g in Generators(GN)];
+    // Most important is to construct lifts as a set to avoid huge repetitions:
+//"Create big lifts set"; time
+    lifts :=
+	{ MatrixRing(Integers(det*N), 2) |
+	     [ExactQuotient(Z!x, det): x in Eltseq(Atilde_modpN*g*AmodpN)]
+	     where g := M2Z!([N*eps[i]: i in [1..4]]) + gn:
+		 eps in CartesianPower([0..det^2-1],4), gn in GNgens
+	};
+    end if;
+
+/*
+"final #lifts:", #lifts;
+"final set #lifts:", #Set(lifts);
+#lifts;
+*/
+
+    else
+
+/******/
+// OLD
+
     // GpN := ImageInLevelGL(G : N := det*N); 
     // The above line is slow. check why we are not simply lifting
     lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
 		   eps in CartesianPower([0..det^2-1],4)] : g in Generators(GN)];
+
+"#lifts:", #lifts;
+
+if #lifts le 5000 then
+    "lifts:", lifts;
+end if;
+
     // !! TODO : Not sure that we really need det^2 here, check that
 
 /*
@@ -623,23 +700,70 @@ R := Integers(det^2*N);
 //gl;
 //Universe(lifts);
 MR := MatrixRing(R, 2);
-gens := {MR ! x: x in lifts};
 
-    AmodpN := MatrixAlgebra(Integers(det^2*N),2)!A;
-    Atilde_modpN := Adjoint(AmodpN);
+/*
+"Here #Gens(GN):", #Generators(GN);
+"Here det:", det;
+"Here #lifts:", #lifts;
+Universe(lifts);
+"Move to set";
+*/
+
+gens := lifts;
+//time
+gens := {MR ! x: x in lifts};
+// "#set:", #gens;
+
     //gens := [Atilde_modpN*g*AmodpN : g in Generators(GpN)];
     gens := [Atilde_modpN*g*AmodpN : g in gens];
+//"new gens:", gens;
+"gens univ:";
+Universe(gens);
+
 //    assert &and[&and[(Integers()!x) mod det eq 0  : x in Eltseq(g)] : g in gens];
-    Z := Integers();
+
     lifts := [GL(2,Integers(det*N))!
-		 [(Z!x) div det : x in Eltseq(g)] 
+		 [ExactQuotient(Z!x, det): x in Eltseq(g)] 
 		 : g in gens];
     /*
     lifts := &cat[[M2Z!([N*eps[i] : i in [1..4]]) + M2Z!Matrix(g) : 
 		   eps in CartesianPower([0..det-1],4)] : 
 		  g in im_mod_N];
    */
-    conj_mod_pN := sub<GL(2, Integers(det*N)) | lifts>;
+"final #lifts:", #lifts;
+"final #set lifts:", #Set(lifts);
+
+/******/
+// END OLD
+
+    end if;
+
+
+    if 1 eq 1 then
+
+	gl := GL(2, Integers(det*N));
+	lifts := ChangeUniverse(Set(lifts), gl);
+
+	k := 2;
+	repeat
+//"Try conj_mod_pN ngens:", k;
+	    conj_mod_pN := sub<gl| [Random(lifts): i in [1..k]]>;
+	    k +:= 1;
+	until forall{h: h in lifts | h in conj_mod_pN};
+//"FINAL conj_mod_pN:", conj_mod_pN;
+    else
+
+	conj_mod_pN := sub<GL(2, Integers(det*N)) | lifts>;
+
+    end if;
+
+/*
+"GET ORDER; ngens:", Ngens(conj_mod_pN);
+Generic(conj_mod_pN);
+time _ := #conj_mod_pN;
+"Order:", #conj_mod_pN;
+*/
+
     ret := PSL2Subgroup(conj_mod_pN, IsExactLevel);
     // Not equal because ret_slow only sees the PSL2 subgroup (det eq 1)
     // ret_slow := slow_conjugate(G, A, IsExactLevel);
@@ -1109,21 +1233,40 @@ INFO := 0 eq 1;
 
 //"om IMAGE:", Image(om); "m IMAGE:", Image(om);
 
+     m`FindCosetQTMap := find_coset;
+
      H`FindCoset := om;
      H`FindCosetQ := m;
 
+
 //"SET H`FindCoset:", H`FindCoset;
 
-     // In the case N eq 1, we leave it as it was - coudl an dshould do better but not now
+     // In the case N eq 1, we leave it as it was - could and should do better but not now
      if (N eq 1) then
+//"*** SubgroupFromMod 1";
 	 det_cosets := Transversal(H0, H`ImageInLevel);
-	 dom := [Determinant(x) : x in det_cosets];
-	 H`DetRep := map< dom -> H0 | [<Determinant(x),x> : x in det_cosets] >;
+	 dom := [Determinant(x): x in det_cosets];
+	 codom := H0;
+	 pairs := [<Determinant(x), x>: x in det_cosets];
+	 //H`DetRep := map<dom -> H0 | [<Determinant(x),x>: x in det_cosets]>;
      else
+//"*** SubgroupFromMod 2";
 	 det_cosets := Image(det_hom);
 	 dom := [x[1,1] : x in det_cosets];
-	 H`DetRep := map< dom -> H0 | [<x[1,1],x@@det_hom> : x in det_cosets] >;
+	 codom := H0;
+	 pairs := [<x[1,1],x@@det_hom> : x in det_cosets];
+	 //H`DetRep := map<dom -> H0 | [<x[1,1],x@@det_hom>: x in det_cosets]>;
      end if;
+/*
+"#det_cosets:", #det_cosets;
+"DetRep dom:", dom;
+Universe(dom);
+"DetRep codom:", codom;
+"OLD x pairs:", [<Determinant(x),x> : x in det_cosets];
+*/
+
+     H`DetRep := set_up_det_map(dom, codom, pairs);
+
      if IsExactLevel then
         H`Level := N;
      else
