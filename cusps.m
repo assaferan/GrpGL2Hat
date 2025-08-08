@@ -259,7 +259,7 @@ end intrinsic;
 
 intrinsic Width(G::GrpGL2Hat,x::Any) -> RngIntElt
 {Same as CuspWidth}
-   require Type(x) in {Infty, FldRatElt, SetCspElt} :
+   require Type(x) in {Infty, FldRatElt, SetCspGElt} :
           "The cusp should be given either as a rational number, " *
           "Infinity(), or an element of Cusps()";
    return CuspWidth(G, x);
@@ -278,7 +278,7 @@ intrinsic CuspWidth(G::GrpGL2Hat,x::FldRatElt) -> RngIntElt
 end intrinsic;
 
 
-intrinsic CuspWidth(G::GrpGL2Hat,x::SetCspElt) -> RngIntElt
+intrinsic CuspWidth(G::GrpGL2Hat,x::SetCspGElt) -> RngIntElt
 {"} // "
 if false and assigned G`cusp_widths then
       S := G`cusps;
@@ -302,7 +302,7 @@ if false and assigned G`cusp_widths then
    end for;
 end intrinsic;
 
-intrinsic CuspInftyElt(cusp::SetCspElt) -> GrpGL2HatElt
+intrinsic CuspInftyElt(cusp::SetCspGElt) -> GrpGL2HatElt
 {Computes an element alpha such that alpha sends infinity to the cusp}
   a := Eltseq(cusp);
   PSLZ := PSL2(Integers());
@@ -315,7 +315,7 @@ intrinsic CuspInftyElt(cusp::SeqEnum[RngIntElt]) -> GrpGL2HatElt
    return CuspInftyElt(Cusp(cusp[1], cusp[2]));
 end intrinsic;	  
 
-intrinsic IsRegularCusp(G::GrpGL2Hat, a::SetCspElt) -> BoolElt
+intrinsic IsRegularCusp(G::GrpGL2Hat, a::SetCspGElt) -> BoolElt
 {Returns whether a is a regular cusp for G.}
     GL2Q := GL(2, Rationals());
     alpha := GL2Q!Matrix(CuspInftyElt(Eltseq(a)));

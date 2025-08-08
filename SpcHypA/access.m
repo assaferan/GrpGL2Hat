@@ -24,7 +24,7 @@ end intrinsic;
 
 intrinsic ExactValue(x::SpcHypAElt) -> .
     {For x an element of the upperhalf plane, if x is a cusp,
-    returns the value of x as an object of type SetCspElt;
+    returns the value of x as an object of type SetCspGElt;
     if x has an exact value in a quadratic extension, returns
     this value, as an object of type FldQuadElt; otherwise
     returns a complex value of type FldComElt}

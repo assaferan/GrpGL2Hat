@@ -61,7 +61,7 @@ function HalfPlaneEltReal(X,x)
 end function;
 
 function HalfPlaneEltCusp(X,x)
-   // (X::SpcHypA,x::SetCspElt) -> SpcHypAElt
+   // (X::SpcHypA,x::SetCspGElt) -> SpcHypAElt
     z := New(SpcHypAElt);
     z`is_exact := true;
     z`is_cusp  := true;
@@ -242,7 +242,7 @@ end function;
 //                                                            //
 //                     Coercions                              //
 // from:                                                      //
-// SpcHypAElt, SetCspElt, FldComElt,  FldRatElt, FldNumElt.     // 
+// SpcHypAElt, SetCspGElt, FldComElt,  FldRatElt, FldNumElt.     // 
 ////////////////////////////////////////////////////////////////
 
 forward comparable;
@@ -252,7 +252,7 @@ intrinsic IsCoercible(X::SpcHypA,x::.) -> BoolElt, SpcHypAElt
     case Type(x):
       when SpcHypAElt:
          return true, x;
-      when SetCspElt:
+      when SetCspGElt:
          return true, HalfPlaneEltCusp(X,x);
       when SeqEnum:
          if Type(Universe(x)) eq SetCsp then

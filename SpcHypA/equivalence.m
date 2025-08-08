@@ -10,7 +10,7 @@ freeze;
 
 
 
-intrinsic IsEquivalent(G::GrpGL2Hat,a::SetCspElt,b::SetCspElt)
+intrinsic IsEquivalent(G::GrpGL2Hat,a::SetCspGElt,b::SetCspGElt)
    -> BoolElt, GrpGL2HatElt
    {for a congruence subgroup G,
    finds whether the cusps a and b are equivalent under the
@@ -236,7 +236,7 @@ intrinsic IsEquivalent(G::GrpGL2Hat,a::SpcHypAElt,b::SpcHypAElt)
 end intrinsic;
    
 
-intrinsic IsEquivalent(G::GrpGL2Hat,E1::[SetCspElt],E2::[SetCspElt])
+intrinsic IsEquivalent(G::GrpGL2Hat,E1::[SetCspGElt],E2::[SetCspGElt])
    -> BoolElt, GrpGL2HatElt
    {For a congruence subgroup G and edges a and b, which are given
    by pairs of cusps, return true or false depending on whether the

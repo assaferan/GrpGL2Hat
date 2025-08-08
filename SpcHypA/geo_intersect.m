@@ -70,7 +70,7 @@ function complexintersectionInfinity(real,edge,H)
 end function;
    
 
-intrinsic GeodesicsIntersection(x::[SetCspElt],y::[SetCspElt],H::SpcHypA)
+intrinsic GeodesicsIntersection(x::[SetCspGElt],y::[SetCspGElt],H::SpcHypA)
    -> SeqEnum
    {computes the intersection in the upper
    half plane of the two geodesics x, y,

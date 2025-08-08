@@ -52,7 +52,7 @@ intrinsic ComplexValue(z::SpcHypAElt : Precision := 0, MaxValue := 600, CheckInf
             _, i := Min([ Abs(congs[i] - cmpx) : i in [1..#congs] ]);
             z`complex_value := congs[i];
           end if;
-       elif Type(K) eq SetCsp then
+       elif Type(K) eq SetCspG then
           z`complex_value := ComplexField(Precision)!Rationals()!Eltseq(z0);
        end if;
     end if;

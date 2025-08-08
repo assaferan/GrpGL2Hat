@@ -60,7 +60,7 @@ intrinsic '*' (a::RngElt,x::[SpcHypAElt]) -> SeqEnum
 end intrinsic;
 
 
-intrinsic '*' (a::RngIntElt,x::SetCspElt) -> SetCspElt
+intrinsic '*' (a::RngIntElt,x::SetCspGElt) -> SetCspGElt
     {}
     u,v:=Explode(Eltseq(x));
     if v eq 0 then return Cusps()![1,0];
@@ -69,7 +69,7 @@ intrinsic '*' (a::RngIntElt,x::SetCspElt) -> SetCspElt
     end if;
  end intrinsic;
 
- intrinsic '*' (a::FldRatElt,x::SetCspElt) -> SetCspElt
+ intrinsic '*' (a::FldRatElt,x::SetCspGElt) -> SetCspGElt
     {}
     u,v:=Explode(Eltseq(x));
     if v eq 0 then return Cusps()![1,0];
@@ -79,13 +79,13 @@ intrinsic '*' (a::RngIntElt,x::SetCspElt) -> SetCspElt
 end intrinsic;
 
 
-intrinsic '*' (a::RngIntElt,x::[SetCspElt]) -> SeqEnum
+intrinsic '*' (a::RngIntElt,x::[SetCspGElt]) -> SeqEnum
     {}
     return [a*v : v in x];
 end intrinsic;
 
 
-intrinsic '*' (a::FldRatElt,x::[SetCspElt]) -> SeqEnum
+intrinsic '*' (a::FldRatElt,x::[SetCspGElt]) -> SeqEnum
     {}
     return [a*v : v in x];
 end intrinsic;

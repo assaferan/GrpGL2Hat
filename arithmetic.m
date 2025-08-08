@@ -90,7 +90,7 @@ end intrinsic;
 
 
  /*
-intrinsic '*' (A::AlgMatElt,z::SetCspElt) -> RngElt
+intrinsic '*' (A::AlgMatElt,z::SetCspGElt) -> RngElt
     {"} // "
     // Action on the upper half plane:
     a,b,c,d := Explode(Eltseq(A));
@@ -106,7 +106,7 @@ intrinsic '*' (A::GrpGL2HatElt,z::SpcHypAElt) -> SpcHypAElt
    // Action on elements of upper half plane union cusps:
 
    a,b,c,d := Explode(Eltseq(A`Element));
-   if IsCusp(z) and Type(ExactValue(z)) eq SetCspElt then
+   if IsCusp(z) and Type(ExactValue(z)) eq SetCspGElt then
       //	require Type(a) in {FldRatElt, RngIntElt}:
       //	"Argument 1 must be defined over the rationals " *
       //	"or integers when argument 2 is a cusp.";
@@ -154,7 +154,7 @@ intrinsic '*' (A::GrpGL2HatElt,z::SpcHypAElt) -> SpcHypAElt
 end intrinsic;
 
 
-intrinsic '*' (A::GrpGL2HatElt,z::SetCspElt) -> SetCspElt
+intrinsic '*' (A::GrpGL2HatElt,z::SetCspGElt) -> SetCspGElt
     {"} // "
     a,b,c,d := Explode(Eltseq(A`Element));
     u,v := Explode(Eltseq(z));
@@ -185,7 +185,7 @@ intrinsic '*' (A::GrpGL2HatElt,z::[SpcHypAElt]) -> SeqEnum
     return [P|A*x : x in z];
 end intrinsic;
 
-intrinsic '*' (A::GrpGL2HatElt,z::[SetCspElt]) -> SeqEnum
+intrinsic '*' (A::GrpGL2HatElt,z::[SetCspGElt]) -> SeqEnum
    {"} // "
    // Action on elements of upper half plane union cusps:
    require Universe(z) eq Cusps():

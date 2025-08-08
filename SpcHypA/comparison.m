@@ -59,9 +59,9 @@ end intrinsic;
 
 
 // similar comments to above, only more so, this being
-// related to William's SetCspElt type.
+// related to William's SetCspGElt type.
 
-intrinsic 'lt' (x::SetCspElt,Y::[SetCspElt]) -> BoolElt
+intrinsic 'lt' (x::SetCspGElt,Y::[SetCspGElt]) -> BoolElt
    {}
    found := false;
    i := 1;
