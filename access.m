@@ -6,6 +6,8 @@ freeze;
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
+DUMP := 0 eq 1;
+
 declare attributes GrpGL2HatElt : MatrixH, MatrixD, MatrixDCenter;
 
 intrinsic BaseRing(G::GrpGL2Hat) -> Rng
@@ -147,26 +149,139 @@ intrinsic ModLevelGL(G::GrpGL2Hat) -> GrpMat
   return G`ModLevelGL;
 end intrinsic;
 
+declare attributes Map: DetMapInfo;
+
+function set_up_det_map(dom, codom, pairs)
+   //[<Determinant(x),x> : x in det_cosets] >;
+
+/*
+"GOT pairs:", pairs;
+"COND:", #pairs gt 0, Nrows(pairs[1, 2]) eq 1,
+forall{p: p in pairs | p[1] eq p[2, 1,1]};
+*/
+
+   n := Nrows(pairs[1, 2]);
+   if
+      #pairs gt 0 and
+      /* Nrows(pairs[1, 2]) eq 1 and */
+      forall{p: p in pairs |
+	 p[1] eq m[1,1] and forall{j: j in [2 .. n] | m[j, j] eq 1}
+	    where m := p[2]
+      }
+   then
+      // Image f(s) has s in [1,1] spot; 1 elsewhere on diag
+      f := map< dom -> codom | x :-> Matrix(1, 1, [x])>;
+      info := [];
+   else
+      info := [];
+      Z := IntegerRing();
+      for p in pairs do
+	 info[Z!p[1]] := p[2];
+      end for;
+   end if;
+//"INFO:", info;
+   f := map< dom -> codom | pairs>;
+   f`DetMapInfo := info;
+   return f;
+end function;
+
+
+declare attributes Map: FindCosetQTMap;
+
 intrinsic GetFindCoset(G::GrpGL2Hat) -> Map
 {.}
   if not assigned G`FindCoset then
+
+/*
+"*** GetFindCoset"; "G:", G;
+"TES G:", G;
+"ModLevel(G):", ModLevel(G): Minimal;
+"ImageInLevel(G):", ImageInLevel(G): Minimal;
+*/
+
     cosets, find_coset := Transversal(ModLevel(G), ImageInLevel(G));
+
+//"GetFindCoset ORDERS,#Tr:", #ModLevel(G), #ImageInLevel(G), #cosets;
+
     N := Level(G);
     if N eq 1 then
       G`FS_cosets := [PSL2(BaseRing(G))!1];
     else
       G`FS_cosets := [PSL2(BaseRing(G)) | FindLiftToSL2(c) : c in cosets];
     end if;
+
     codom := [<i, cosets[i]^(-1)> : i in [1..#cosets]];
-    coset_idx := map<cosets -> codom |
-       [<cosets[i], codom[i] > : i in [1..#cosets]] >;
-    G`FindCoset := find_coset*coset_idx;
+    if 1 eq 1 then
+	A := AssociativeArray();
+	for i in [1..#cosets] do
+	    A[cosets[i]] := codom[i];
+	end for;
+	coset_idx := map<Universe(cosets) -> Universe(codom) | x :-> A[x]>;
+    else
+	coset_idx := map<cosets -> codom |
+	   [<cosets[i], codom[i] > : i in [1..#cosets]] >;
+    end if;
+
+    m := find_coset*coset_idx;
+om := m;
+    GG := ModLevel(G);
+
+/*
+"find_coset:", find_coset;
+"";
+
+"orig m:", m;
+"orig m codom:", Codomain(m);
+"";
+*/
+
+    if 1 eq 1 and #GG le 10^5 then
+	A := AssociativeArray();
+	for g in GG do
+	    A[g] := m(g);
+	end for;
+	m := map<(GG) -> Universe(codom) | x :-> A[x]>;
+	//m := map<(GG) -> (codom) | x :-> A[x]>;
+
+//rand := Random(GG); "rand:", rand; "im:", m(rand);
+	//assert m(rand) eq om(rand);
+
+//"GG:", GG; "new m:", m;
+    end if;
+
+// "final m codom:", Codomain(m); "m TES:"; TES(m); "ORIG G TES:"; TES(G);
+
+    m`FindCosetQTMap := find_coset;
+
+    G`FindCoset := om;
+    G`FindCosetQ := m;
+
     det_cosets := Transversal(ImageInLevelGL(G), ImageInLevel(G));
     dom := [Determinant(x) : x in det_cosets];
+    pairs := [<Determinant(x), x> : x in det_cosets];
+
+/*
+"*** GetFindCoset";
+"#det_cosets:", #det_cosets;
+"DetRep dom:", dom;
+Universe(dom);
+"OLD pairs:", pairs;
+*/
+
+    /*
     G`DetRep := map< dom -> ImageInLevelGL(G) |
      [<Determinant(x),x> : x in det_cosets] >;
+    */
+
+    G`DetRep := set_up_det_map(dom, ImageInLevelGL(G), pairs);
   end if;
-  return G`FindCoset;
+
+  /*
+  if assigned G`FindCosetQ then
+      return G`FindCosetQ;
+  end if;
+  */
+  return G`FindCoset, G`FindCosetQ;
 end intrinsic;
 
 intrinsic NSCartanV(G::GrpGL2Hat) -> RngIntResElt
