@@ -814,8 +814,9 @@ intrinsic Conjugate(G::GrpGL2Hat, A::GrpMatElt : IsExactLevel := false) -> GrpGL
   // At the moment we always calculate generators
   // If they have not been calculated yet, can add later more efficient
   // methods
-  // return slow_conjugate(G, A, IsExactLevel);
-  return fast_conjugate(G, A, IsExactLevel);
+  return slow_conjugate(G, A, IsExactLevel);
+  // This is still not working, e.g. for S13!
+  // return fast_conjugate(G, A, IsExactLevel);
 end intrinsic;
 
 intrinsic '^'(G::GrpGL2Hat, A::GrpMatElt) -> GrpGL2Hat
