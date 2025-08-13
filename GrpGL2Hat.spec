@@ -14,6 +14,7 @@
   farey_gamma1.m
   farey_symbol.m
   misc.m
+  signature.m
   words_for_matrices.m
   words_for_matricesSL2.m
 
